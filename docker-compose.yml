@@ -1,0 +1,38 @@
+version: "3.6"
+
+services: 
+  root:
+    image: nginx
+    ports: 
+      - 80:80
+    volumes: 
+      - ./nginx/my-nginx.conf:/etc/nginx/my-nginx.conf:ro
+      - ./nginx/:/usr/share/nginx/html/:ro
+    command: /bin/bash -c "nginx -c /etc/nginx/my-nginx.conf"
+
+  
+  node:
+    image: node:slim
+    user: "node"
+    working_dir: /home/node/app
+    ports:
+      - 8011:8011
+    volumes: 
+      - ./node:/home/node/app
+    expose: 
+      - 8011
+    command: /bin/bash -c "yarn && yarn start"
+
+  blog:
+    image: wordpress
+    restart: always
+    ports:
+      - 8012:80
+    environment:
+      WORDPRESS_DB_PASSWORD: example
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
